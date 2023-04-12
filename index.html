@@ -29,8 +29,6 @@
                     <label for="">العملة</label>
                     <div class="currency-box">دولار أمريكي</div>
                 </div>
-           
-             
             </div>
 
             <!-- converted result -->
@@ -45,7 +43,6 @@
         </div>
     </div>
 
- 
 <script>
     // Get elements
     const amountInput = document.getElementById('amount-input');
@@ -54,20 +51,46 @@
     const convertBtn = document.getElementById('convert-btn');
 
     // Calculate and display result
-    convertBtn.addEventListener('click', () => {
+    convertBtn.addEventListener('click', async () => {
         const amount = amountInput.value;
 
         // Perform calculation (16% reduction)
         const convertedAmount = amount * 0.84; // 100% - 16% = 84%
 
-        // Perform additional conversion to 19.30
-        const finalConvertedAmount = convertedAmount * 19.30;
+        try {
+            // Perform additional conversion to 19.30
+            const exchangeRate = await getExchangeRate();
+            const finalConvertedAmount = convertedAmount * exchangeRate.TRY;
 
-        fromResult.textContent = `${amount} `;
-        toResult.textContent = `${finalConvertedAmount.toFixed(2)} ليرة تركية`;
+            fromResult.textContent = `${amount} `;
+            toResult.textContent = `${finalConvertedAmount.toFixed(2)} Turkish Lira`;
+        } catch (error) {
+            console.error('Error:', error);
+            toResult.textContent = 'Failed to fetch exchange rate. Please try again later.';
+        }
     });
+
+    // Function to make API request for currency conversion
+    async function getExchangeRate() {
+        const apiKey = 'f04cf2c79f0fd6f70711280c';
+        const url = `https://v6.exchangerate-api.com/v6/${apiKey}/latest/USD`;
+
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error('Failed to fetch exchange rate. Please try again later.');
+        }
+
+        const data = await response.json();
+        const exchangeRate = data.conversion_rates;
+        return exchangeRate;
+    }
 </script>
 
-</body>
 
+
+
+
+
+
+</body>
 </html>
